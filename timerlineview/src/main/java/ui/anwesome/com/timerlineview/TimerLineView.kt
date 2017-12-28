@@ -8,7 +8,8 @@ import android.view.*
 import android.content.*
 import android.graphics.*
 import java.util.*
-
+import java.util.concurrent.ConcurrentLinkedQueue
+val colors = arrayOf("#FF5722","#4CAF50","#3F51B5","#f44336","#00796B","#448AFF")
 class TimerLineView(ctx:Context):View(ctx) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     var times:LinkedList<Int> = LinkedList()
@@ -48,4 +49,47 @@ class TimerLineView(ctx:Context):View(ctx) {
             cb(time.toFloat()/t.toFloat())
         }
     }
+    data class TimerLineContainer(var w:Float,var h:Float,var times:LinkedList<Int>,var j:Int = 0) {
+        val timers:ConcurrentLinkedQueue<TimerLine> = ConcurrentLinkedQueue()
+        init {
+            val gap = (0.9f*h)/(times.size+1)
+            var y = gap
+            var i = 0
+            times.forEach {
+                timers.add(TimerLine(it,i,y))
+                y += gap
+                i++
+            }
+        }
+        fun draw(canvas:Canvas,paint:Paint) {
+            timers.forEach {
+                it.draw(canvas,paint,w)
+            }
+            val pieScale = (timers?.at(j)?.state?.t?.toFloat()?:0f)/(timers?.at(j)?.state?.time?.toFloat()?:0f)
+            if(j < timers.size && timers.size>0) {
+                val gap = 360f/timers.size
+                paint.style = Paint.Style.STROKE
+                paint.color = Color.parseColor(colors[j% colors.size])
+                canvas.drawArc(RectF(w/2-h/20,0f,w/2+h/20,h/10),j*gap,j*gap+gap*pieScale,false,paint)
+            }
+        }
+        fun update(stopcb: (Int) -> Unit) {
+            if(j < timers.size) {
+                timers.at(j)?.update{
+                    j++
+                    stopcb(it)
+                }
+            }
+        }
+    }
+}
+fun ConcurrentLinkedQueue<TimerLineView.TimerLine>.at(i:Int):TimerLineView.TimerLine? {
+    var index = 0
+    this.forEach {
+        if(index == i) {
+            return it
+        }
+        index++
+    }
+    return null
 }
