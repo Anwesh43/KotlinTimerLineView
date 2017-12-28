@@ -73,11 +73,40 @@ class TimerLineView(ctx:Context):View(ctx) {
                 canvas.drawArc(RectF(w/2-h/20,0f,w/2+h/20,h/10),j*gap,j*gap+gap*pieScale,false,paint)
             }
         }
-        fun update(stopcb: (Int) -> Unit) {
+        fun update(stopcb: (Int) -> Unit,renderStop:()->Unit) {
             if(j < timers.size) {
                 timers.at(j)?.update{
                     j++
                     stopcb(it)
+                    if(j == timers.size) {
+                        renderStop()
+                    }
+                }
+            }
+        }
+    }
+    data class TimerLineRenderer(var view:TimerLineView,var time:Int = 0) {
+        var container:TimerLineContainer?=null
+        var running = true
+        fun render(canvas:Canvas,paint:Paint) {
+            if(time == 0) {
+                val w = canvas.width.toFloat()
+                val h = canvas.height.toFloat()
+                container = TimerLineContainer(w,h,view.times)
+            }
+            container?.draw(canvas,paint)
+            container?.update({
+
+            },{
+                running = false
+            })
+            time++
+            if(running) {
+                try {
+                    Thread.sleep(1000)
+                    view.invalidate()
+                } catch(ex: Exception) {
+
                 }
             }
         }
