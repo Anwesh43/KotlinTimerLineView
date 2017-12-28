@@ -44,15 +44,26 @@ class TimerLineView(ctx:Context):View(ctx) {
     }
     data class TimerLineState(var time:Int,var t:Int = 0) {
         fun update(stopcb:()->Unit) {
+            if(t == time) {
+                stopcb()
+                return
+            }
             t++
-            stopcb()
+
         }
         fun executeFn(cb:(Float)->Unit) {
-            cb(time.toFloat()/t.toFloat())
+            cb(t.toFloat()/time.toFloat())
+        }
+    }
+    data class CircleIndicator(var i:Int) {
+        fun draw(canvas: Canvas,paint: Paint,deg:Float,w:Float,h:Float) {
+            paint.color = Color.parseColor(colors[i% colors.size])
+            canvas.drawArc(RectF(w/2-h/20,0f,w/2+h/20,h/10),i*deg,i*deg+deg,false,paint)
         }
     }
     data class TimerLineContainer(var w:Float,var h:Float,var times:LinkedList<Int>,var j:Int = 0) {
         val timers:ConcurrentLinkedQueue<TimerLine> = ConcurrentLinkedQueue()
+        val circles:ConcurrentLinkedQueue<CircleIndicator> = ConcurrentLinkedQueue()
         init {
             val gap = (0.9f*h)/(times.size+1)
             var y = gap
@@ -71,13 +82,17 @@ class TimerLineView(ctx:Context):View(ctx) {
             if(j < timers.size && timers.size>0) {
                 val gap = 360f/timers.size
                 paint.style = Paint.Style.STROKE
+                circles.forEach {
+                    it.draw(canvas,paint,gap,w,h)
+                }
                 paint.color = Color.parseColor(colors[j% colors.size])
-                canvas.drawArc(RectF(w/2-h/20,0f,w/2+h/20,h/10),j*gap,j*gap+gap*pieScale,false,paint)
+                canvas.drawArc(RectF(w/2-h/20,0f,w/2+h/20,h/10),j*gap,gap*pieScale,false,paint)
             }
         }
         fun update(stopcb: (Int) -> Unit,renderStop:()->Unit) {
             if(j < timers.size) {
                 timers.at(j)?.update{
+                    circles.add(CircleIndicator(j))
                     j++
                     stopcb(it)
                     if(j == timers.size) {
