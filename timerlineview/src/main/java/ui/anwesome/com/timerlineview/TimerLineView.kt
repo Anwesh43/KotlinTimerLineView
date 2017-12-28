@@ -116,7 +116,7 @@ class TimerLineView(ctx:Context):View(ctx) {
     companion object {
         fun create(activity:Activity):TimerLineView {
             val view = TimerLineView(activity)
-            return view 
+            return view
         }
     }
 }
