@@ -12,9 +12,11 @@ import java.util.concurrent.ConcurrentLinkedQueue
 val colors = arrayOf("#FF5722","#4CAF50","#3F51B5","#f44336","#00796B","#448AFF")
 class TimerLineView(ctx:Context):View(ctx) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    val renderer = TimerLineRenderer(this)
     var times:LinkedList<Int> = LinkedList()
     override fun onDraw(canvas:Canvas) {
-
+        canvas.drawColor(Color.parseColor("#212121"))
+        renderer.render(canvas,paint)
     }
     fun addTime(time:Int) {
         times.add(time)
