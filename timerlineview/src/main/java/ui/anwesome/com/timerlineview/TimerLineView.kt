@@ -21,15 +21,24 @@ class TimerLineView(ctx:Context):View(ctx) {
     fun addToParent(activity:Activity) {
         activity.setContentView(this)
     }
-    data class Timer(var time:Int,var i:Int,var y:Float) {
+    data class TimerLine(var time:Int,var i:Int,var y:Float) {
         fun draw(canvas: Canvas,paint:Paint,w:Float) {
             paint.strokeWidth = w/30
             paint.strokeCap = Paint.Cap.ROUND
             paint.color = Color.GRAY
             canvas.drawLine(w/10,y,9*w/10,y,paint)
         }
-        fun update() {
+        fun update(stopcb:(Int)->Unit) {
 
+        }
+    }
+    data class TimerLineState(var time:Int,var t:Int = 0) {
+        fun update(stopcb:()->Unit) {
+            t++
+            stopcb()
+        }
+        fun executeFn(cb:(Float)->Unit) {
+            cb(time.toFloat()/t.toFloat())
         }
     }
 }
