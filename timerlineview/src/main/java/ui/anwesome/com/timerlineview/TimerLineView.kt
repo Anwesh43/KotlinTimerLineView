@@ -58,7 +58,7 @@ class TimerLineView(ctx:Context):View(ctx) {
     data class CircleIndicator(var i:Int) {
         fun draw(canvas: Canvas,paint: Paint,deg:Float,w:Float,h:Float) {
             paint.color = Color.parseColor(colors[i% colors.size])
-            canvas.drawArc(RectF(w/2-h/20,0f,w/2+h/20,h/10),i*deg,i*deg+deg,false,paint)
+            canvas.drawArc(RectF(w/2-h/20,0f,w/2+h/20,h/10),i*deg,deg,false,paint)
         }
     }
     data class TimerLineContainer(var w:Float,var h:Float,var times:LinkedList<Int>,var j:Int = 0) {
