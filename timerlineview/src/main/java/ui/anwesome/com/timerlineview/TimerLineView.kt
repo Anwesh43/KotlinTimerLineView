@@ -113,6 +113,12 @@ class TimerLineView(ctx:Context):View(ctx) {
             }
         }
     }
+    companion object {
+        fun create(activity:Activity):TimerLineView {
+            val view = TimerLineView(activity)
+            return view 
+        }
+    }
 }
 fun ConcurrentLinkedQueue<TimerLineView.TimerLine>.at(i:Int):TimerLineView.TimerLine? {
     var index = 0
