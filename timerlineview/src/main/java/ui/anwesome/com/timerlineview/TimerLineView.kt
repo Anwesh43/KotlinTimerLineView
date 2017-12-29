@@ -11,6 +11,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 val colors = arrayOf("#FF5722","#4CAF50","#3F51B5","#f44336","#00796B","#448AFF")
 class TimerLineView(ctx:Context):View(ctx) {
+    var onTimerFinishListener:OnTimerFinishListener?=null
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     val renderer = TimerLineRenderer(this)
     var times:LinkedList<Int> = LinkedList()
@@ -20,6 +21,9 @@ class TimerLineView(ctx:Context):View(ctx) {
     }
     fun addTime(time:Int) {
         times.add(time)
+    }
+    fun addOnTimerFinishListener(listener:(Int)->Unit) {
+        onTimerFinishListener = OnTimerFinishListener(listener)
     }
     fun addToParent(activity:Activity) {
         activity.setContentView(this)
@@ -113,7 +117,7 @@ class TimerLineView(ctx:Context):View(ctx) {
             }
             container?.draw(canvas,paint)
             container?.update({
-
+                view.onTimerFinishListener?.onFinishListener?.invoke(it)
             },{
                 running = false
             })
@@ -134,6 +138,7 @@ class TimerLineView(ctx:Context):View(ctx) {
             return view
         }
     }
+    data class OnTimerFinishListener(var onFinishListener:(Int)->Unit)
 }
 fun ConcurrentLinkedQueue<TimerLineView.TimerLine>.at(i:Int):TimerLineView.TimerLine? {
     var index = 0
