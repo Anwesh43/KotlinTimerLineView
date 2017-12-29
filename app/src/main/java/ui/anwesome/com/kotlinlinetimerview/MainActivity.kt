@@ -2,6 +2,7 @@ package ui.anwesome.com.kotlinlinetimerview
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import ui.anwesome.com.timerlineview.TimerLineView
 
 class MainActivity : AppCompatActivity() {
@@ -15,5 +16,8 @@ class MainActivity : AppCompatActivity() {
         view.addTime(15)
         view.addTime(20)
         view.addToParent(this)
+        view.addOnTimerFinishListener { i ->
+            Toast.makeText(this,"Timer $i finished",Toast.LENGTH_SHORT).show()
+        }
     }
 }
